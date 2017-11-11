@@ -13,7 +13,16 @@ not_connected=$?
 
 if [ $not_connected -eq 1 ]; then
   echo Not connected
+
+  # Start green LED in heartbeat blinking whilst in AP mode
+  existing_act_led_trigger=`cat /sys/devices/platform/leds/leds/led0/trigger | perl -pe 's/.*\[(.*)\].*/$1/'`
+  echo timer > /sys/devices/platform/leds/leds/led0/trigger
+  echo 2000 > /sys/devices/platform/leds/leds/led0/delay_on
+  echo 1500 > /sys/devices/platform/leds/leds/led0/delay_off
+
   wifi-connect --clear=true
+
+  echo $existing_act_led_trigger > /sys/devices/platform/leds/leds/led0/trigger
 
   # Now see if we're connected
   # systemd will run this script again if not
